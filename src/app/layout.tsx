@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+"use client";
 import "./globals.css";
+import "devextreme/dist/css/dx.common.css";
+import "devextreme/dist/css/dx.light.compact.css";
 
-export const metadata: Metadata = {
-  title: "CS458 Project",
-};
+import { SessionProvider } from "next-auth/react";
 
 export default function RootLayout({
   children,
@@ -12,7 +12,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <meta />
+      <body>
+        <div
+          // centering div
+          style={{
+            minHeight: "100dvh",
+            width: "100%",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <SessionProvider>{children}</SessionProvider>
+        </div>
+      </body>
     </html>
   );
 }
