@@ -7,7 +7,7 @@ const GoogleSignInButton = () => {
       text="Sign In with Google"
       stylingMode="contained"
       icon={googleIcon}
-      onClick={() => signIn("google")}
+      onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
     />
   );
 };

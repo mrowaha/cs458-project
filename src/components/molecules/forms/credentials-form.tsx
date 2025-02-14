@@ -17,7 +17,7 @@ const CredentialsSignInForm = ({
       return;
     const signInResponse = await signIn("credentials", {
       ...formModel.toJson,
-      redirect: false,
+      callbackUrl: "/dashboard",
     });
   };
 
