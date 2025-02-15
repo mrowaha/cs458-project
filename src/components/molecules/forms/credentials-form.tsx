@@ -16,11 +16,19 @@ const CredentialsSignInForm = ({
   onSuccess(): unknown;
 }) => {
   const [submit, setSubmit] = useState(false);
+  const [submittedTrys, setSubmittedTrys] = useState(0);
   const router = useRouter();
   const handleSubmit = async () => {
     setSubmit(true);
     if (Boolean(formModel.errors.email) || Boolean(formModel.errors.password))
       return;
+
+    const _currentTry = submittedTrys + 1
+    setSubmittedTrys(prev => prev+1)
+    if (_currentTry >= 5) {
+      return
+    }
+
     const signInResponse = await signIn("credentials", {
       ...formModel.toJson,
       redirect: false,
@@ -33,7 +41,7 @@ const CredentialsSignInForm = ({
       onError();
     }
   };
-
+  console.log(submittedTrys)
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
       <div>
@@ -75,6 +83,12 @@ const CredentialsSignInForm = ({
         icon={signInIcon}
         onClick={handleSubmit}
       />
+      {
+      submittedTrys >= 5 &&  <ErrorToast 
+        id="credentials__max-attempts"
+        error="Max Attempts (5) have been reached. Please try later"
+      />
+      }
     </div>
   );
 };

@@ -66,43 +66,43 @@ class AppTest(unittest.TestCase):
         """Close WebDriver after each test"""
         self.driver.quit()
 
-    # def test_incomplete_fields(self: "AppTest"):
-    #     self.sign_in_button.click()
-    #     email_error_toast = WebDriverWait(self.driver, 10).until(
-    #         expected_conditions.presence_of_element_located(
-    #             (By.ID, "credentials__email-error"))
-    #     )
-    #     self.assertIsNotNone(
-    #         email_error_toast, "Email Error Toast should be visible")
+    def test_incomplete_fields(self: "AppTest"):
+        self.sign_in_button.click()
+        email_error_toast = WebDriverWait(self.driver, 10).until(
+            expected_conditions.presence_of_element_located(
+                (By.ID, "credentials__email-error"))
+        )
+        self.assertIsNotNone(
+            email_error_toast, "Email Error Toast should be visible")
 
-    #     password_error_toast = WebDriverWait(self.driver, 10).until(
-    #         expected_conditions.presence_of_element_located(
-    #             (By.ID, "credentials__password-error"))
-    #     )
-    #     self.assertIsNotNone(password_error_toast,
-    #                          "Password Erorr Toast should be visible")
+        password_error_toast = WebDriverWait(self.driver, 10).until(
+            expected_conditions.presence_of_element_located(
+                (By.ID, "credentials__password-error"))
+        )
+        self.assertIsNotNone(password_error_toast,
+                             "Password Erorr Toast should be visible")
 
-    # def test_unauthorized_login(self: "AppTest"):
-    #     self.email_input_field.send_keys("a")
-    #     self.password_input_field.send_keys("b")
-    #     self.sign_in_button.click()
-    #     unauth_error_toast = WebDriverWait(self.driver, 10).until(
-    #         expected_conditions.presence_of_element_located(
-    #             (By.ID, "login__unauthorized"))
-    #     )
-    #     self.assertIsNotNone(unauth_error_toast,
-    #                          "Unauthorized should be visible")
+    def test_unauthorized_login(self: "AppTest"):
+        self.email_input_field.send_keys("a")
+        self.password_input_field.send_keys("b")
+        self.sign_in_button.click()
+        unauth_error_toast = WebDriverWait(self.driver, 10).until(
+            expected_conditions.presence_of_element_located(
+                (By.ID, "login__unauthorized"))
+        )
+        self.assertIsNotNone(unauth_error_toast,
+                             "Unauthorized should be visible")
 
-    # def test_successful_login(self: "AppTest"):
-    #     self.email_input_field.send_keys("john.doe@example.com")
-    #     self.password_input_field.send_keys("P@ssw0rd123")
-    #     self.sign_in_button.click()
+    def test_successful_login(self: "AppTest"):
+        self.email_input_field.send_keys("john.doe@example.com")
+        self.password_input_field.send_keys("P@ssw0rd123")
+        self.sign_in_button.click()
 
-    #     expected_url = "http://localhost:3000/dashboard"
-    #     WebDriverWait(self.driver, 10).until(
-    #         lambda d: d.current_url == expected_url)
-    #     self.assertEqual(self.driver.current_url, expected_url,
-    #                      "Expected Url after successful login should be /dashboard")
+        expected_url = "http://localhost:3000/dashboard"
+        WebDriverWait(self.driver, 10).until(
+            lambda d: d.current_url == expected_url)
+        self.assertEqual(self.driver.current_url, expected_url,
+                         "Expected Url after successful login should be /dashboard")
 
     def test_spotifyoauth_flow(self: "AppTest"):
         self.spotify_button.click()
@@ -133,6 +133,30 @@ class AppTest(unittest.TestCase):
         )
         self.assertIsNotNone(welcome_message,
                              "User should be authorized via spotify oauth")
+
+    def test_access_denied(self: "AppTest"):
+        self.driver.get("http://localhost:3000/dashboard")
+        denied_message = WebDriverWait(self.driver, 10).until(
+            expected_conditions.presence_of_element_located(
+                (By.ID, "dashboard__access-denied"))
+        )
+        self.assertIsNotNone(denied_message,
+                             "User should be not authorized")
+
+    def test_max_attempts(self: "AppTest"):
+        self.email_input_field.send_keys("a")
+        self.password_input_field.send_keys("b")
+        for _ in range(5):
+            self.sign_in_button.click()
+            time.sleep(1)
+
+        max_attempts_toast = WebDriverWait(self.driver, 10).until(
+            expected_conditions.presence_of_all_elements_located(
+                (By.ID, "credentials__max-attempts"))
+        )
+        self.assertIsNotNone(max_attempts_toast, "Max Attempts of 5 should be allowed")
+        time.sleep(5)
+
 
 
 if __name__ == '__main__':
