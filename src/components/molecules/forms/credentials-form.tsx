@@ -5,26 +5,40 @@ import { observer } from "mobx-react";
 import { useState } from "react";
 import { ICredentialsFormModel } from "./credentials-form.model";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 const CredentialsSignInForm = ({
   formModel,
+  onError,
+  onSuccess,
 }: {
   formModel: ICredentialsFormModel;
+  onError(): unknown;
+  onSuccess(): unknown;
 }) => {
   const [submit, setSubmit] = useState(false);
+  const router = useRouter();
   const handleSubmit = async () => {
     setSubmit(true);
     if (Boolean(formModel.errors.email) || Boolean(formModel.errors.password))
       return;
     const signInResponse = await signIn("credentials", {
       ...formModel.toJson,
-      callbackUrl: "/dashboard",
+      redirect: false,
     });
+
+    if (signInResponse.ok) {
+      onSuccess();
+      router.push("/dashboard");
+    } else {
+      onError();
+    }
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
       <div>
         <TextBox
+          id="credentials__email-input"
           value={formModel.email}
           onValueChanged={({ value }) => formModel.setEmail(value)}
           label="Email"
@@ -32,12 +46,16 @@ const CredentialsSignInForm = ({
           labelMode="static"
         />
         {Boolean(formModel.errors.email) && submit && (
-          <ErrorToast error={formModel.errors.email} />
+          <ErrorToast
+            id="credentials__email-error"
+            error={formModel.errors.email}
+          />
         )}
       </div>
 
       <div>
         <TextBox
+          id="credentials__password-input"
           value={formModel.password}
           onValueChanged={({ value }) => formModel.setPassword(value)}
           label="Password"
@@ -45,10 +63,18 @@ const CredentialsSignInForm = ({
           labelMode="static"
         />
         {Boolean(formModel.errors.password) && submit && (
-          <ErrorToast error={formModel.errors.password} />
+          <ErrorToast
+            id="credentials__password-error"
+            error={formModel.errors.password}
+          />
         )}
       </div>
-      <Button text="Sign In" icon={signInIcon} onClick={handleSubmit} />
+      <Button
+        id="credentials__sign-in-button"
+        text="Sign In"
+        icon={signInIcon}
+        onClick={handleSubmit}
+      />
     </div>
   );
 };
@@ -56,9 +82,10 @@ const CredentialsSignInForm = ({
 export default observer(CredentialsSignInForm);
 
 // helpers //////////
-function ErrorToast({ error }: { error: string }) {
+function ErrorToast({ error, id }: { error: string; id: string }) {
   return (
     <div
+      id={id}
       style={{ display: "flex", backgroundColor: "#F87171", borderRadius: 10 }}
     >
       <div

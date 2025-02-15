@@ -4,18 +4,21 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 function Dashboard() {
-  const { data: session } = useSession();
-  const loggedIn = useMemo(() => session && session.user, [session]);
+  const { data: session, status } = useSession();
   const router = useRouter();
   useEffect(() => {
-    if (!loggedIn) setTimeout(() => router.replace("/"), 1000);
-  }, [loggedIn]);
+    if (status === "unauthenticated") router.replace("/");
+  }, [status]);
 
-  if (loggedIn) {
-    return <h1>Welcome, {session.user.email}</h1>;
+  if (status === "loading") {
+    return <h1>Loading...</h1>;
   }
 
-  return <h1>Redirecting to Sign In</h1>;
+  if (status === "unauthenticated") {
+    return <h1>Access Denied</h1>;
+  }
+
+  return <h1>Welcome, {session.user.email}</h1>;
 }
 
 export default Dashboard;

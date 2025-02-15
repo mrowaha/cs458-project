@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 const GoogleSignInButton = () => {
   return (
     <Button
+      id="oauth__google-button"
       text="Sign In with Google"
       stylingMode="contained"
       icon={googleIcon}
