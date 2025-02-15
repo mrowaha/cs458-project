@@ -1,12 +1,18 @@
 import NextAuth, { User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import SpotifyProvider from "next-auth/providers/spotify";
 import CredentialsProvider from "next-auth/providers/credentials";
 import users from "@/data.json";
+
 const handler = NextAuth({
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    }),
+    SpotifyProvider({
+      clientId: process.env.SPOTIFY_CLIENT_ID as string,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
     }),
     CredentialsProvider({
       name: "Sign in",

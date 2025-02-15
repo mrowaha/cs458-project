@@ -1,4 +1,5 @@
 "use client";
+import SpotifySignIn from "@/components/atoms/buttons/spotify-signin";
 import styles from "./page.module.css";
 import GoogleSignInButton from "@/components/atoms/buttons/GoogleSignInButton";
 import CredentialsSignInForm from "@/components/molecules/forms/credentials-form";
@@ -30,6 +31,7 @@ export default function Login() {
       />
       <div className={styles["login-form__divider"]} />
       <GoogleSignInButton />
+      <SpotifySignIn />
       {forbiddenLogin && <UnAuthLogin />}
       <footer>© Copyright 2025: Muhammad Rowaha (All Rights Reserved)</footer>
     </div>

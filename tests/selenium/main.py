@@ -8,17 +8,16 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.firefox.service import Service
-
+from selenium.webdriver.firefox.options import Options
 load_dotenv()
-
 
 class AppTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         """Set up WebDriver and get google login credentials from arguments"""
-        cls.google_email = os.getenv("GMAIL")
-        cls.google_password = os.getenv("GOOGLE_PASSWORD")
+        cls.spotify_email = os.getenv("SPOTIFY_EMAIL")
+        cls.spotify_password = os.getenv("SPOTIFY_PASSWORD")
 
     @property
     def email_input_field(self: "AppTest"):
@@ -45,16 +44,22 @@ class AppTest(unittest.TestCase):
         return sign_in_button
 
     @property
-    def google_button(self: "AppTest"):
-        google_button = WebDriverWait(self.driver, 10).until(
+    def spotify_button(self: "AppTest"):
+        spotify_button = WebDriverWait(self.driver, 10).until(
             expected_conditions.element_to_be_clickable(
-                (By.ID, "oauth__google-button"))
+                (By.ID, "oauth__spotify-button"))
         )
-        return google_button
+        return spotify_button
 
     def setUp(self):
         """Set up a new WebDriver for each test"""
-        self.driver = webdriver.Chrome()
+        options = Options()
+        # options.add_argument("-profile")
+        # options.add_argument(os.path.expanduser("~/snap/firefox/common/.mozilla/firefox/vucz17wc.default-1739580418569"))  # Replace with your profile name
+
+        gecko_path = os.path.abspath("./geckodriver") 
+        service = Service(gecko_path)
+        self.driver = webdriver.Firefox(service=service, options=options)
         self.driver.get("http://localhost:3000")
 
     def tearDown(self):
@@ -99,17 +104,35 @@ class AppTest(unittest.TestCase):
     #     self.assertEqual(self.driver.current_url, expected_url,
     #                      "Expected Url after successful login should be /dashboard")
 
-    def test_googleoauth_flow(self: "AppTest"):
-        self.google_button.click()
-        time.sleep(5)
+    def test_spotifyoauth_flow(self: "AppTest"):
+        self.spotify_button.click()
 
         email_input = WebDriverWait(self.driver, 10).until(
             expected_conditions.presence_of_element_located(
-                (By.XPATH, "//input[@type='email']"))
+                (By.ID, "login-username"))
         )
-        email_input.send_keys(self.google_email)  # Use your test email
-        email_input.send_keys(Keys.RETURN)
-        time.sleep(10)
+        email_input.send_keys(self.spotify_email)
+
+        password_input = WebDriverWait(self.driver, 10).until(
+            expected_conditions.presence_of_element_located(
+                (By.ID, "login-password"))
+        )
+        password_input.send_keys(self.spotify_password)
+        time.sleep(2)
+
+        sign_in_button = WebDriverWait(self.driver, 10).until(
+            expected_conditions.element_to_be_clickable(
+                (By.ID, "login-button"))
+        )
+        sign_in_button.click()
+
+        # now we expect to be redirected to dashboard and have welcome message visible
+        welcome_message = WebDriverWait(self.driver, 10).until(
+            expected_conditions.presence_of_element_located(
+                (By.ID, "dashboard__welcome-user"))
+        )
+        self.assertIsNotNone(welcome_message,
+                             "User should be authorized via spotify oauth")
 
 
 if __name__ == '__main__':
