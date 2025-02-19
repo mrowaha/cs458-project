@@ -9,6 +9,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.firefox.options import Options
+
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+
+
 load_dotenv()
 
 class AppTest(unittest.TestCase):
@@ -52,15 +57,29 @@ class AppTest(unittest.TestCase):
         return spotify_button
 
     def setUp(self):
-        """Set up a new WebDriver for each test"""
-        options = Options()
-        # options.add_argument("-profile")
-        # options.add_argument(os.path.expanduser("~/snap/firefox/common/.mozilla/firefox/vucz17wc.default-1739580418569"))  # Replace with your profile name
-
-        gecko_path = os.path.abspath("./geckodriver") 
-        service = Service(gecko_path)
-        self.driver = webdriver.Firefox(service=service, options=options)
+        """Set up a new WebDriver for each test with Chrome or Firefox"""
+        browser = os.getenv("BROWSER", "chrome").lower()
+        
+        if browser == "chrome":
+            options = ChromeOptions()
+            chrome_path = os.path.abspath("./chromedriver")
+            service = ChromeService(chrome_path)
+            self.driver = webdriver.Chrome(service=service, options=options)
+        
+        elif browser == "firefox":
+            from selenium.webdriver.firefox.service import Service as FirefoxService
+            from selenium.webdriver.firefox.options import Options as FirefoxOptions
+            
+            options = FirefoxOptions()
+            gecko_path = os.path.abspath("./geckodriver")
+            service = FirefoxService(gecko_path)
+            self.driver = webdriver.Firefox(service=service, options=options)
+        
+        else:
+            raise ValueError(f"Unsupported browser: {browser}")
+        
         self.driver.get("http://localhost:3000")
+
 
     def tearDown(self):
         """Close WebDriver after each test"""
