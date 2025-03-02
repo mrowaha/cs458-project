@@ -21,8 +21,8 @@ class AppTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up WebDriver and get google login credentials from arguments"""
-        cls.spotify_email = os.getenv("SPOTIFY_EMAIL")
-        cls.spotify_password = os.getenv("SPOTIFY_PASSWORD")
+        cls.keycloak_username = os.getenv("KEYCLOAK_USERNAME")
+        cls.keycloak_password = os.getenv("KEYCLOAK_PASSWORD")
 
     @property
     def email_input_field(self: "AppTest"):
@@ -49,12 +49,12 @@ class AppTest(unittest.TestCase):
         return sign_in_button
 
     @property
-    def spotify_button(self: "AppTest"):
-        spotify_button = WebDriverWait(self.driver, 10).until(
+    def keycloak_button(self: "AppTest"):
+        _keycloak_button = WebDriverWait(self.driver, 10).until(
             expected_conditions.element_to_be_clickable(
-                (By.ID, "oauth__spotify-button"))
+                (By.ID, "oauth__keycloak-button"))
         )
-        return spotify_button
+        return _keycloak_button
 
     def setUp(self):
         """Set up a new WebDriver for each test with Chrome or Firefox"""
@@ -123,28 +123,26 @@ class AppTest(unittest.TestCase):
         self.assertEqual(self.driver.current_url, expected_url,
                          "Expected Url after successful login should be /dashboard")
 
-    def test_spotifyoauth_flow(self: "AppTest"):
-        self.spotify_button.click()
-
+    def test_keycloak_flow(self: "AppTest"):
+        self.keycloak_button.click()
         email_input = WebDriverWait(self.driver, 10).until(
             expected_conditions.presence_of_element_located(
-                (By.ID, "login-username"))
+                (By.ID, "username"))
         )
-        email_input.send_keys(self.spotify_email)
+        email_input.send_keys(self.keycloak_username)
 
         password_input = WebDriverWait(self.driver, 10).until(
             expected_conditions.presence_of_element_located(
-                (By.ID, "login-password"))
+                (By.ID, "password"))
         )
-        password_input.send_keys(self.spotify_password)
+        password_input.send_keys(self.keycloak_password)
         time.sleep(2)
 
         sign_in_button = WebDriverWait(self.driver, 10).until(
             expected_conditions.element_to_be_clickable(
-                (By.ID, "login-button"))
+                (By.ID, "kc-login"))
         )
         sign_in_button.click()
-
         # now we expect to be redirected to dashboard and have welcome message visible
         welcome_message = WebDriverWait(self.driver, 10).until(
             expected_conditions.presence_of_element_located(

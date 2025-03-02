@@ -2,6 +2,7 @@ import NextAuth, { User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import SpotifyProvider from "next-auth/providers/spotify";
 import CredentialsProvider from "next-auth/providers/credentials";
+import KeycloakProvider from "next-auth/providers/keycloak"
 import users from "@/data.json";
 
 const handler = NextAuth({
@@ -13,6 +14,11 @@ const handler = NextAuth({
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID as string,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
+    }),
+    KeycloakProvider({
+      clientId: process.env.KEYCLOAK_CLIENT_ID,
+      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
+      issuer: process.env.KEYCLOAK_ISSUER
     }),
     CredentialsProvider({
       name: "Sign in",

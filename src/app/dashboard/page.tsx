@@ -11,7 +11,7 @@ function Dashboard() {
   if (status === "unauthenticated") {
     return <h1 id="dashboard__access-denied">Access Denied</h1>;
   }
-
+  console.log(session)
   return <h1 id="dashboard__welcome-user">Welcome, {session.user.email}</h1>;
 }
 
